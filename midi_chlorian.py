@@ -107,7 +107,15 @@ def call_signature():
     '''Attempts to find a call signature for the word underneath the cursor and
     prints it using echo.'''
     param_str_len = 6  # len('param_')
-    signature = createScript().call_signatures()
+
+    try:
+        # Unfortunately this operation errors out sometimes, with an error
+        # saying - Please provide a position that exists on this node
+        # The error is coming from parso which jedi uses.
+        # So, we have to handle the exception.
+        signature = createScript().call_signatures()
+    except ValueError as e:
+        return
 
     vim.command('echo ""')  # Cleans the line
     # If we don't want to do that on every text change event, we can move this
@@ -121,3 +129,36 @@ def call_signature():
              for p in signature.params])
 
         vim.command('echon "%s"' % (signature.name + '(' + params + ')'))
+
+def show_docstring():
+    '''Attempts to find the docstring for a definition and disply it in a
+    preview window.'''
+    # TODO: Syntax highlighting would be cool
+    definitions = createScript().goto_definitions()
+
+    if not definitions:
+        return
+
+    definition = definitions[0]
+    if len(definitions) > 1:
+        definition = _choose_definition(definitions)
+
+    vim.command('let s:docstring=[]')
+    vim.bindeval('s:docstring').extend([definition.docstring()])
+
+    vim_docstring_cmds = '''
+split Doc
+setlocal noswapfile
+setlocal buftype=nofile
+setlocal modifiable
+silent $put=s:docstring[0]
+silent normal! ggdd
+setlocal nomodifiable
+setlocal nomodified
+noremap <buffer> q :q<CR>
+highlight Midi_Chlorian_Docstring ctermfg=blue
+match Midi_Chlorian_Docstring /./
+'''
+
+    for cmd in vim_docstring_cmds.split('\n')[1:]:
+        vim.command(cmd)

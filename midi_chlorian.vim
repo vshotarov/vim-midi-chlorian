@@ -61,5 +61,11 @@ function! Midi_Chlorian_Call_Signature()
 	python midi_chlorian.call_signature()
 endfunction
 
+function! Midi_Chlorian_Docstring()
+	" Attempts to find a docstring for the current word under the cursor
+	" and displays it in a preview window
+	python midi_chlorian.show_docstring()
+endfunction
+
 " Call the init function
 call Midi_Chlorian_Init()
