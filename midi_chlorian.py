@@ -45,6 +45,7 @@ def complete():
 
     return completions
 
+
 def _choose_definition(definitions):
     '''Presents the user with an input list of definitions to choose one.'''
     str_definitions = []
@@ -59,6 +60,7 @@ def _choose_definition(definitions):
     choice = int(vim.eval('s:definition_choice')) - 1
 
     return definitions[choice]
+
 
 def goto_definition(assignment=False, recursive=True):
     '''Looks for definitions matching the word under the cursor and attempts
@@ -80,9 +82,9 @@ def goto_definition(assignment=False, recursive=True):
     if not definition.line:
         if not recursive:
             return
-        # If the path and line attributes are None, that means that the definition
-        # is in the current file and it's probably just a simple variable.
-        # In that case, we need to use goto_assignments()
+        # If the path and line attributes are None, that means that the 
+        # definition is in the current file and it's probably just a simple 
+        # variable. In that case, we need to use goto_assignments()
         return goto_definition(assignment=True, recursive=False)
 
     vim_goto_commands = '''
@@ -99,3 +101,23 @@ normal! zz''' % definition.line
 
     for cmd in vim_goto_commands.split('\n')[1:]:
         vim.command(cmd)
+
+
+def call_signature():
+    '''Attempts to find a call signature for the word underneath the cursor and
+    prints it using echo.'''
+    param_str_len = 6  # len('param_')
+    signature = createScript().call_signatures()
+
+    vim.command('echo ""')  # Cleans the line
+    # If we don't want to do that on every text change event, we can move this
+    # inside the if statement. It's here, so it gets rid of the signature when
+    # we are no longer inside of the function call.
+    # The presumption being, this is used inside of a TextChangedI event
+    if signature:
+        signature = signature[0]
+        params = ', '.join(
+            [p.description[param_str_len:].replace('\n', ' ')
+             for p in signature.params])
+
+        vim.command('echon "%s"' % (signature.name + '(' + params + ')'))

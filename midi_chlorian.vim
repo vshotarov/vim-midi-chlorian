@@ -55,5 +55,11 @@ function! Midi_Chlorian_Goto_Assignment()
 	python midi_chlorian.goto_definition(assignment=True, recursive=False)
 endfunction
 
+function! Midi_Chlorian_Call_Signature()
+	" Attempts to find a call signature of the word before the last 
+	" opened bracket
+	python midi_chlorian.call_signature()
+endfunction
+
 " Call the init function
 call Midi_Chlorian_Init()
