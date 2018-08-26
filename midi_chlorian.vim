@@ -44,7 +44,15 @@ function! Midi_Chlorian_Complete(findstart, base)
 endfunction
 
 function! Midi_Chlorian_Goto_Definition()
+	" Attemts to find a definition for the current word under the cursor
+	" If the definition, does not contain a line number it is treated
+	" as a local variable and goto_assignment is attempted
 	python midi_chlorian.goto_definition()
+endfunction
+
+function! Midi_Chlorian_Goto_Assignment()
+	" Goes to the assignment of the current word under the cursor
+	python midi_chlorian.goto_definition(assignment=True, recursive=False)
 endfunction
 
 " Call the init function
