@@ -128,7 +128,9 @@ def call_signature():
             [p.description[param_str_len:].replace('\n', ' ')
              for p in signature.params])
 
-        vim.command('echon "%s"' % (signature.name + '(' + params + ')'))
+        vim.command('echon "%s"' %
+                    (signature.name + '(' + params.replace('\"', '\\"') + ')'))
+
 
 def show_docstring():
     '''Attempts to find the docstring for a definition and disply it in a
